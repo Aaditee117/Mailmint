@@ -1,0 +1,12 @@
+.env
+sent_log.csv
+learned_patterns.json
+preview.txt
+resume.pdf
+people.csv
+applications_tracker.xlsx
+_scratch/
+__pycache__/
+*.pyc
+.venv/
+venv/

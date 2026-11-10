@@ -1,0 +1,50 @@
+# Read directly by the autonomous pipeline's own reasoning each cycle (see
+# AUTONOMOUS_PIPELINE_PROMPT.md) - not parsed by any Python code. Edit by hand.
+
+# Tier 1: fixed company watchlist, scraped directly via each company's own
+# ATS (Greenhouse/Lever/Ashby/SmartRecruiters/Workable/Recruitee) using the
+# khadinakbar/career-site-job-scraper Apify actor. Cheap, precise, and comes
+# with a real requisition ID - but only covers companies listed here.
+#
+# Seeded 2026-08-24 with the 2 companies confirmed live during pipeline
+# testing (khadinakbar/career-site-job-scraper actually resolved these two
+# URLs and returned real postings; several other guessed slugs - Razorpay,
+# Chargebee, Browserstack, Freshworks, Innovaccer, Whatfix, Zerodha, Meesho,
+# Groww, Highradius, Clevertap - did not resolve and are not listed here).
+# Add more as you find them.
+ats_companies:
+  - name: "Postman"
+    careers_url: "https://boards.greenhouse.io/postman"
+  - name: "CRED"
+    careers_url: "https://jobs.lever.co/cred"
+
+# Tier 2: broader multi-board search (Indeed/Glassdoor/ZipRecruiter/LinkedIn)
+# via the apricot_blackberry/job-board-aggregator Apify actor. Runs from
+# cycle one even with an empty ats_companies list above - this is the wide
+# net that isn't limited to a fixed company list.
+aggregator_search:
+  keywords:
+    - "Data Engineer"
+    - "Software Engineer"
+    - "Data Analyst"
+  locations:
+    - "India"
+    - "Remote"
+
+# Carried over verbatim from JOB_SEARCH_PROMPT.md's "WHAT TO SEARCH FOR" and
+# "PAY THRESHOLD" sections - if the underlying policy changes, edit
+# JOB_SEARCH_PROMPT.md itself and update this to match, rather than letting
+# the two drift apart.
+relevance:
+  target_roles:
+    - "Data Engineer"
+    - "Software Engineer"
+    - "Data Analyst"
+  seniority: "entry-level/fresher (0-2 yrs); surface stretch roles too if the skill match is strong"
+  recency_days_default: 7
+  recency_days_widen_to: 30
+
+pay_threshold:
+  internship_min_stipend_inr_per_month: 20000
+  internship_min_stipend_waived_if_fully_remote: true
+  fulltime_and_freelance_min: null # no strict minimum; note pay/rate when disclosed

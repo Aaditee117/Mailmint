@@ -1,0 +1,41 @@
+sender:
+  # Shown in the From header and available in the template as {sender_name}.
+  name: "Aaditee Agrawal"
+  # Blank means "same as GMAIL_USER".
+  reply_to: ""
+  # Path to your resume. Blank or missing file means no attachment.
+  resume: "Data-resume.pdf"
+
+send:
+  # Kept here as a seatbelt. `send` is dry-run unless you also pass --live.
+  min_delay_seconds: 15
+  max_delay_seconds: 60
+  # Gmail's own ceiling is ~500/day (free) or ~2000/day (Workspace). Staying far
+  # below it is what keeps the account healthy.
+  max_per_day: 200
+  max_per_run: 50
+  smtp_host: smtp.gmail.com
+  smtp_port: 587
+
+reconcile:
+  imap_host: imap.gmail.com
+  lookback_days: 7
+
+dns:
+  # Corporate and VPN nameservers often refuse external MX lookups. The tool
+  # probes the system resolvers first and falls back to these if none answer.
+  fallback_servers: ["8.8.8.8", "1.1.1.1", "9.9.9.9"]
+  timeout_seconds: 2.5
+
+guess:
+  # Applied to any person whose CSV row has no `sector` value.
+  # One of: indian_services, indian_product, us_startup, us_enterprise, default
+  default_sector: indian_services
+  # Domains to try when a row gives a company name but no domain.
+  domain_tlds: [".com", ".in", ".co.in", ".io", ".net", ".ai", ".tech"]
+
+paths:
+  people: people.csv
+  template: template.txt
+  sent_log: sent_log.csv
+  learned: learned_patterns.json

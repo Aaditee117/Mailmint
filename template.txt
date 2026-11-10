@@ -1,0 +1,23 @@
+# Placeholders: {first_name}, {last_name}, {full_name}, {company}, {role}, {job_id}, {notes}, {sender_name}
+# {first_name}/{last_name}/{full_name} are the RECIPIENT; {sender_name} is you.
+
+Subject: Referral Request - {role} ({job_id})
+
+Hi {first_name},
+
+I'm reaching out about the {role} opening ({job_id}) at {company} in Bengaluru. I'm a Computer Science graduate from Chandigarh University and recently completed a six-month Software Engineer internship in data engineering at Optimus Information, where my work maps to the JD:
+
+- Python, PySpark and SQL - ETL/ELT pipelines with Delta Lake on Microsoft Fabric
+- Scheduling and orchestration - pipeline schedules and triggers with Azure Data Factory, including incremental CDC loads
+- ETL fundamentals - SCD Type 2 logic, plus schema and data validation checks across ingestion runs
+- Data quality - reusable checks with logging and quarantine of bad records
+
+I can start contributing to data pipelines from day one.
+
+Resume attached. Could you refer me or forward it to the hiring team, or point me to the right person? Happy to connect on LinkedIn, or call/WhatsApp me directly.
+
+Thanks,
+{sender_name}
++91-6386862949 (call/WhatsApp)
+linkedin.com/in/aaditee-agrawal-345a4a25a
+aadiagrawal69@gmail.com

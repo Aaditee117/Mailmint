@@ -1,0 +1,34 @@
+SUBJECT: Graduate Engineer Trainee Application - {{CANDIDATE_NAME}} | {{UNIVERSITY}}
+
+---
+
+Dear Hiring Team,
+
+I am writing to express my strong interest in the Graduate Engineer Trainee position at Ingram Micro for the {{LOCATION_PREFERENCE}} location. As a 2026 graduate with a {{DEGREE}} in {{SPECIALIZATION}} from {{UNIVERSITY}}, I am excited to begin my professional journey with your organization and contribute to meaningful technology solutions.
+
+TECHNICAL CAPABILITIES:
+
+• Programming Languages: {{PROGRAMMING_LANGUAGES}}
+• Database & SQL: {{DATABASE_KNOWLEDGE}}
+• Cloud & Advanced Technologies: {{CLOUD_EXPERIENCE}}
+• Practical Experience: {{PROJECT_EXPERIENCE}}
+
+My academic foundation combined with hands-on project work has equipped me with a solid understanding of modern software development practices. I am particularly drawn to Ingram Micro's structured onboarding program and the opportunity to learn from experienced mentors while working on live projects. I am committed to quickly adapting to industry standards and contributing meaningfully to your technology initiatives.
+
+I have attached my resume for your review and would welcome the opportunity to discuss how my technical background and eagerness to learn align with Ingram Micro's requirements. Thank you for considering my application.
+
+Best regards,
+
+{{CANDIDATE_NAME}}
+{{PHONE}}
+{{EMAIL_ADDRESS}}
+Resume: {{RESUME_FILE}}
+
+---
+
+Application Details:
+Position: Graduate Engineer Trainee
+Company: Ingram Micro
+Location: {{LOCATION_PREFERENCE}}
+Job Link: https://careers.ingrammicro.com/en/jobs/r-115589/graduate-engineer-trainee/
+Submission Date: {{SUBMISSION_DATE}}
