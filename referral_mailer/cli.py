@@ -167,6 +167,11 @@ def cmd_add(args: argparse.Namespace) -> int:
     return 0
 
 
+def _template_path(config: Config, args: argparse.Namespace) -> Path:
+    override = getattr(args, "template", None)
+    return _resolve(config.root, override) if override else config.template_path
+
+
 def _resume_or_fail(config: Config, override: str | None = None) -> Path | None:
     """Resolve the attachment, refusing to send silently without a configured one."""
     path = _resolve(config.root, override) if override else config.resume_path
@@ -296,7 +301,7 @@ def _render_preview(
 
 def cmd_preview(args: argparse.Namespace) -> int:
     config, people, learned, sent_log = _load_common(args)
-    template = load_template(config.template_path)
+    template = load_template(_template_path(config, args))
     plans, _ = build_plans(
         people, config, learned, sent_log,
         allow_discovery=True, retry_bounced=args.retry_bounced,
@@ -327,7 +332,7 @@ def cmd_preview(args: argparse.Namespace) -> int:
 
 def cmd_send(args: argparse.Namespace) -> int:
     config, people, learned, sent_log = _load_common(args)
-    template = load_template(config.template_path)
+    template = load_template(_template_path(config, args))
     creds = load_credentials()
     resume = _resume_or_fail(config, args.resume)
 
@@ -392,6 +397,7 @@ def _deliver(
     resume: Path | None,
     sent_log: SentLog,
     learned: LearnedStore,
+    on_progress=None,
 ) -> int:
     sent = failed = 0
     _section("SENDING")
@@ -432,6 +438,9 @@ def _deliver(
                         detail=detail[:500],
                     )
                 )
+
+                if on_progress:
+                    on_progress(index, len(queue), status, candidate.email, detail)
 
                 if status == "send_failed" and "limit" in detail.lower():
                     _out("\n  Stopping: Gmail is rate-limiting this account.")
@@ -476,6 +485,172 @@ def _self_test(
         return 1
     _out("Sent. Check your inbox: attachment present, formatting intact, "
          "no leftover placeholders, and confirm it did not land in spam.")
+    return 0
+
+
+# --------------------------------------------------------------------------
+# compose - a free-form, one-off custom mail
+# --------------------------------------------------------------------------
+
+def _read_compose_body(args: argparse.Namespace) -> str:
+    if args.body_file:
+        return Path(args.body_file).read_text(encoding="utf-8")
+    if args.body:
+        return args.body.replace("\\n", "\n")
+    _out("Type the message body. Finish with a line containing only a dot (.):\n")
+    lines: list[str] = []
+    while True:
+        try:
+            line = input()
+        except EOFError:
+            break
+        if line.strip() == ".":
+            break
+        lines.append(line)
+    return "\n".join(lines)
+
+
+def cmd_compose(args: argparse.Namespace) -> int:
+    """Write and send a completely custom mail to one or more addresses.
+
+    Each recipient still gets their own separate message (never a shared CC).
+    The text is sent exactly as written; only {sender_name} is substituted.
+    """
+    config = load_config(Path(args.config) if args.config else None)
+    recipients = [a.strip() for chunk in args.to for a in chunk.split(",") if a.strip()]
+    bad = [a for a in recipients if "@" not in a or " " in a]
+    if not recipients or bad:
+        raise ConfigError(f"invalid --to address(es): {', '.join(bad) or '(none given)'}")
+
+    subject = (args.subject or "").strip()
+    if not subject and sys.stdin.isatty():
+        subject = input("Subject: ").strip()
+    if not subject:
+        raise ConfigError("a subject is required (--subject)")
+    body = _read_compose_body(args).strip("\n")
+    if not body.strip():
+        raise ConfigError("the message body is empty")
+    body = body.replace("{sender_name}", config.sender_name) + "\n"
+
+    attachments: list[Path] = []
+    for item in args.attach or []:
+        path = _resolve(config.root, item)
+        if not path.exists():
+            raise ConfigError(f"attachment not found: {path}")
+        attachments.append(path)
+
+    sent_log = SentLog(config.sent_log_path)
+    _section("CUSTOM MAIL" if args.live else "CUSTOM MAIL (dry run)")
+    _out(f"To          : {', '.join(recipients)}")
+    _out(f"Subject     : {subject}")
+    _out(f"Attachments : {', '.join(p.name for p in attachments) or 'none'}")
+    _out(RULE)
+    _out(body.rstrip())
+    _out(RULE)
+    for address in recipients:
+        if any(r.email.lower() == address.lower() for r in sent_log.records):
+            _out(f"  ! {address} has been mailed before (see {config.sent_log_path.name})")
+
+    if not args.live:
+        _out("\nNothing sent. Add --live to send.")
+        return 0
+    if not args.yes and not _confirm(f"\nSend to {len(recipients)} recipient(s)?"):
+        _out("Aborted. Nothing sent.")
+        return 1
+
+    creds = load_credentials()
+    failed = 0
+    with GmailSender(config, creds) as sender:
+        for index, address in enumerate(recipients, start=1):
+            status, detail, message_id = "sent", "", ""
+            try:
+                message = build_message(config, creds, address, subject, body, attachments)
+                message_id = sender.send(message)
+                _out(f"  sent     {address}")
+            except SendError as exc:
+                status, detail, failed = "send_failed", str(exc), failed + 1
+                _out(f"  FAILED   {address}: {exc}")
+            sent_log.append(SentRecord(
+                timestamp=utc_now(), person_key=f"custom|{address.lower()}",
+                name="", company="", domain=address.split("@", 1)[1].lower(),
+                scope="", email=address.lower(), pattern="custom", confidence="1.000",
+                attempt="1", message_id=message_id, status=status, detail=detail[:500],
+            ))
+            if index < len(recipients):
+                time.sleep(random.uniform(config.min_delay, config.max_delay))
+    return 0 if failed == 0 else 1
+
+
+# --------------------------------------------------------------------------
+# resume - tailored one-page LaTeX resume
+# --------------------------------------------------------------------------
+
+def cmd_resume(args: argparse.Namespace) -> int:
+    from .resume import ResumeError, build_resume, load_projects
+
+    config = load_config(Path(args.config) if args.config else None)
+    if args.list_projects:
+        for p in load_projects(config.root / "resume" / "projects.yaml"):
+            _out(f"{p.id:<20} {p.title}  [{', '.join(p.tags)}]")
+        return 0
+    if not args.company or not args.role:
+        raise ConfigError("--company and --role are required")
+    try:
+        result = build_resume(
+            config,
+            company=args.company,
+            role=args.role,
+            keywords=[k for k in (args.keywords or "").split(",") if k.strip()],
+            project_ids=[i.strip() for i in (args.projects or "").split(",") if i.strip()],
+            max_projects=args.max_projects,
+            summary=args.summary,
+            max_certs=args.max_certs,
+            experience=args.experience,
+            jd=Path(args.jd_file).read_text(encoding="utf-8") if args.jd_file else "",
+        )
+    except ResumeError as exc:
+        _out(f"\nERROR: {exc}")
+        return 1
+
+    from .tracker import log_application
+
+    try:
+        tracked = log_application(
+            config, company=args.company, role=args.role, job_id=args.job_id or "",
+            apply_link=args.apply_link or "",
+            description=Path(args.jd_file).read_text(encoding="utf-8") if args.jd_file else "",
+            resume_pdf=result.pdf, drive_copy=result.drive_copy, experience=result.experience,
+            projects=[p.title for p in result.projects],
+            keywords=[k.strip() for k in (args.keywords or "").split(",") if k.strip()],
+        )
+    except ConfigError as exc:
+        tracked = None
+        result.notes.append(f"tracker not updated: {exc}")
+
+    _section("RESUME")
+    _out(f"PDF      : {result.pdf}")
+    _out(f"LaTeX    : {result.tex}")
+    _out(f"Pages    : {result.pages}")
+    _out(f"Projects : {', '.join(p.id for p in result.projects)}")
+    _out(f"Certs    : {len(result.certs)}")
+    _out(f"Experience: {result.experience}")
+    _out(f"Objective: {result.objective}")
+    if result.ats:
+        _out(f"ATS match: {len(result.ats['matched'])} of "
+             f"{len(result.ats['matched']) + len(result.ats['missing'])} job skills in resume"
+             + (f"  (missing: {', '.join(result.ats['missing'])})" if result.ats['missing'] else ""))
+    _out(f"Tracker  : {tracked or 'not updated'}")
+    _out(f"Drive    : {result.drive_copy or 'not copied'}")
+    for note in result.notes:
+        _out(f"  ! {note}")
+    _out(f'\nSend with it:  python run.py send --company "{args.company}" --resume "{result.pdf}" --live')
+    return 0 if result.pages <= 1 else 1
+
+
+def cmd_ui(args: argparse.Namespace) -> int:
+    from .ui import serve
+
+    serve(args.config, args.port, open_browser=not args.no_browser)
     return 0
 
 
@@ -653,6 +828,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_discover)
 
     p = subparsers.add_parser("preview", help="render every email; send nothing")
+    p.add_argument("--template", help="use this template file instead of the configured one")
     p.add_argument("--company", help="only this company (substring match)")
     p.add_argument("--bodies", type=int, default=2, help="how many full bodies to print (default 2)")
     p.add_argument("--out", help="also write the preview to this file")
@@ -662,6 +838,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_preview)
 
     p = subparsers.add_parser("send", help="send the queue (dry run unless --live)")
+    p.add_argument("--template", help="use this template file instead of the configured one")
     p.add_argument("--company", help="only this company (substring match)")
     p.add_argument("--live", action="store_true", help="actually send")
     p.add_argument("--yes", action="store_true", help="skip the confirmation prompt")
@@ -672,6 +849,37 @@ def build_parser() -> argparse.ArgumentParser:
                    help="include people whose earlier address failed, using the next guess")
     p.add_argument("--resume", help="override sender.resume for this invocation")
     p.set_defaults(func=cmd_send)
+
+    p = subparsers.add_parser("compose", help="write and send a custom mail to any address")
+    p.add_argument("--to", required=True, action="append", help="recipient(s); repeat or comma-separate")
+    p.add_argument("--subject", help="subject line")
+    p.add_argument("--body", help="message body (use \\n for newlines); omit to type it")
+    p.add_argument("--body-file", dest="body_file", help="read the body from a text file")
+    p.add_argument("--attach", action="append", help="file to attach (repeatable)")
+    p.add_argument("--live", action="store_true", help="actually send")
+    p.add_argument("--yes", action="store_true", help="skip the confirmation prompt")
+    p.set_defaults(func=cmd_compose)
+
+    p = subparsers.add_parser("resume", help="build a tailored one-page LaTeX resume")
+    p.add_argument("--company", help="company name (used in the filename)")
+    p.add_argument("--role", help="role title (used in the filename)")
+    p.add_argument("--keywords", help="comma-separated skills from the JD; ranks your projects")
+    p.add_argument("--projects", help="comma-separated project ids to force (see --list-projects)")
+    p.add_argument("--max-projects", dest="max_projects", type=int, default=3)
+    p.add_argument("--summary", help="one-line summary for this job only")
+    p.add_argument("--max-certs", dest="max_certs", type=int, default=6,
+                   help="max certifications shown, pinned ones included (default 6)")
+    p.add_argument("--job-id", dest="job_id", help="job / requisition id (for the tracker)")
+    p.add_argument("--apply-link", dest="apply_link", help="application URL (for the tracker)")
+    p.add_argument("--jd-file", dest="jd_file", help="text file with the job description (for the tracker)")
+    p.add_argument("--experience", help="force an experience variant by name (default: chosen from the role)")
+    p.add_argument("--list-projects", dest="list_projects", action="store_true")
+    p.set_defaults(func=cmd_resume)
+
+    p = subparsers.add_parser("ui", help="open the local web interface")
+    p.add_argument("--port", type=int, default=5000)
+    p.add_argument("--no-browser", dest="no_browser", action="store_true")
+    p.set_defaults(func=cmd_ui)
 
     p = subparsers.add_parser("reconcile", help="read bounces over IMAP and update the log")
     p.add_argument("--days", type=int, help="how far back to scan (default: config)")

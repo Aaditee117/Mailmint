@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mailmint</title>
+<style>
+  :root {
+    --bg:#f1f8f5; --card:#ffffff; --ink:#12261f; --muted:#5f776d; --line:#d9e9e1;
+    --accent:#0f9d74; --accent-2:#0b7a5a; --accent-soft:#e3f6ee; --accent-ink:#ffffff;
+    --ok:#0b7a5a; --bad:#c2410c; --warn:#a16207; --shadow:0 1px 2px rgba(18,38,31,.06), 0 8px 24px rgba(18,38,31,.06);
+    --hero1:#0f9d74; --hero2:#14b8a6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0c1512; --card:#13201b; --ink:#e6f4ee; --muted:#8fa89d; --line:#233a31;
+            --accent:#34d399; --accent-2:#10b981; --accent-soft:#12302a; --accent-ink:#04120d;
+            --ok:#34d399; --bad:#fb923c; --warn:#facc15; --shadow:0 8px 24px rgba(0,0,0,.35);
+            --hero1:#065f46; --hero2:#0f766e; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:15px/1.55 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; }
+  .hero { background:linear-gradient(135deg,var(--hero1),var(--hero2)); color:#fff;
+          padding:34px 16px 64px; }
+  .hero-in { max-width:880px; margin:0 auto; display:flex; align-items:center; gap:14px; }
+  .logo { width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,.18);
+          display:grid; place-items:center; font-size:26px; backdrop-filter: blur(4px); }
+  .hero h1 { font-size:28px; margin:0; letter-spacing:-.02em; }
+  .hero p { margin:2px 0 0; opacity:.9; }
+  main { max-width:880px; margin:-40px auto 0; padding:0 16px 80px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:16px;
+            padding:22px; margin-bottom:18px; box-shadow:var(--shadow); }
+  h2 { font-size:17px; margin:0 0 16px; display:flex; gap:10px; align-items:center; }
+  h2 span { background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:var(--accent-ink);
+            width:28px; height:28px; border-radius:50%; display:grid; place-items:center;
+            font-size:13px; font-weight:700; box-shadow:0 2px 6px rgba(15,157,116,.35); }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:600px) { .grid { grid-template-columns:1fr; } .hero h1{font-size:24px;} }
+  label { display:block; font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:5px;
+          letter-spacing:.01em; }
+  input, textarea, select { width:100%; padding:10px 12px; border:1.5px solid var(--line);
+      border-radius:10px; background:var(--bg); color:var(--ink); font:inherit;
+      transition:border-color .15s, box-shadow .15s, background .15s; }
+  input::placeholder, textarea::placeholder { color:var(--muted); opacity:.65; }
+  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent);
+      background:var(--card); box-shadow:0 0 0 4px var(--accent-soft); }
+  textarea { min-height:110px; resize:vertical; }
+  .full { grid-column:1 / -1; }
+  button { padding:10px 18px; border-radius:10px; border:1.5px solid var(--line);
+           background:var(--card); color:var(--ink); font:inherit; font-weight:600; cursor:pointer;
+           transition:transform .1s, box-shadow .15s, background .15s; }
+  button:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 4px 12px rgba(18,38,31,.12); }
+  button.primary { background:linear-gradient(135deg,var(--accent),var(--accent-2));
+           color:var(--accent-ink); border-color:transparent; }
+  button.danger { background:#c2410c; color:#fff; border-color:transparent; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:14px; }
+  .msg { margin-top:12px; font-size:14px; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .warn { color:var(--warn); }
+  .muted { color:var(--muted); }
+  details { border:1.5px solid var(--line); border-radius:10px; padding:10px 12px; margin-top:10px;
+            background:var(--bg); }
+  details[open] { background:var(--card); }
+  summary { cursor:pointer; font-weight:600; }
+  pre { white-space:pre-wrap; font:13px/1.5 ui-monospace, Consolas, monospace; margin:10px 0 0;
+        background:var(--accent-soft); padding:12px; border-radius:8px; }
+  .paper { display:block; width:100%; max-width:760px; margin:16px auto 0; background:#fff;
+           border:1px solid var(--line); border-radius:6px; box-shadow:var(--shadow); }
+  table.trk { width:100%; border-collapse:collapse; font-size:13.5px; }
+  table.trk th { text-align:left; color:var(--muted); font-size:12px; padding:6px 8px; border-bottom:1.5px solid var(--line); }
+  table.trk td { padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  table.trk select { padding:4px 8px; border-radius:8px; }
+  iframe { width:100%; height:660px; border:1.5px solid var(--line); border-radius:10px; margin-top:14px; }
+  a { color:var(--accent-2); font-weight:600; }
+  .tag { display:inline-block; background:var(--accent-soft); color:var(--accent-2);
+         border-radius:99px; padding:2px 11px; margin:3px 5px 3px 0; font-size:12.5px; font-weight:600; }
+  .badge { display:inline-block; padding:3px 12px; border-radius:99px; font-weight:700; font-size:13px;
+           background:var(--accent-soft); }
+  .badge.bad { background:#ffedd5; }
+</style>
+</head>
+<body>
+<header class="hero"><div class="hero-in">
+  <div class="logo">&#9993;</div>
+  <div><h1>Mailmint</h1>
+  <p>Enter a job posting once. Get a tailored one-page resume, then mail the referrals.</p></div>
+</div></header>
+<main>
+
+  <section>
+    <h2><span>1</span> Job posting</h2>
+    <div class="grid">
+      <div><label>Company *</label><input id="company" placeholder="CGI" list="companies"></div>
+      <div><label>Role *</label><input id="role" placeholder="Data Engineer"></div>
+      <div><label>Job ID</label><input id="job_id" placeholder="J1126-0226"></div>
+      <div><label>Company mail domain (if known)</label><input id="domain" placeholder="cgi.com"></div>
+      <div class="full"><label>Apply link</label><input id="apply_link" placeholder="https://careers.company.com/job/12345"></div>
+      <div class="full"><label>Job description (paste it, then press Auto-fill)</label>
+        <textarea id="jd" placeholder="Paste the job description here..."></textarea></div>
+      <div class="full"><label>Skills / keywords (comma separated, used to pick projects and certificates)</label>
+        <input id="keywords" placeholder="pyspark, sql, azure data factory"></div>
+    </div>
+    <div class="row"><button id="detect">Auto-fill from description</button></div>
+    <div id="detected" class="msg muted"></div>
+    <datalist id="companies"></datalist>
+  </section>
+
+  <section>
+    <h2><span>2</span> Tailored resume</h2>
+    <div class="grid">
+      <div class="full"><label>Force specific projects (optional, otherwise the best match is chosen)</label>
+        <select id="projects" multiple size="5"></select></div>
+      <div class="full"><label>Career objective for this job (optional, blank keeps your default)</label>
+        <input id="summary"></div>
+    </div>
+    <div class="row"><button class="primary" id="build">Build resume</button></div>
+    <div id="resume-out" class="msg"></div>
+  </section>
+
+  <section>
+    <h2><span>&#9783;</span> Applications tracker</h2>
+    <div class="muted" id="trk-path"></div>
+    <div id="trk-out" class="msg">Loading...</div>
+    <div class="row"><button id="trk-refresh">Refresh</button></div>
+  </section>
+
+  <section>
+    <h2><span>3</span> People to email</h2>
+    <div class="grid">
+      <div class="full"><label>Names (paste straight from a LinkedIn people search, one per line)</label>
+        <textarea id="names"></textarea></div>
+      <div><label>Sector</label>
+        <select id="sector"><option value="">default</option><option>indian_services</option>
+        <option>indian_product</option><option>us_startup</option><option>us_enterprise</option></select></div>
+      <div><label>Known address (Full Name|addr@domain) - greatly improves accuracy</label><input id="sample"></div>
+      <div class="full"><label>Notes (available as {notes})</label><input id="notes"></div>
+      <div class="full"><label>Custom email subject for this batch (optional; blank uses template.txt)</label><input id="subject"></div>
+      <div class="full"><label>Custom email body (optional; placeholders like {first_name}, {company}, {role}, {job_id}, {sender_name} work)</label>
+        <textarea id="body" placeholder="Leave empty to use template.txt"></textarea></div>
+    </div>
+    <div class="row"><button class="primary" id="addpeople">Save people</button></div>
+    <div id="people-out" class="msg"></div>
+  </section>
+
+  <section>
+    <h2><span>4</span> Preview and send</h2>
+    <div class="row">
+      <button id="preview">Preview emails</button>
+      <label style="margin:0;display:flex;gap:6px;align-items:center">
+        <input type="checkbox" id="retry" style="width:auto"> retry bounced</label>
+    </div>
+    <div id="preview-out" class="msg"></div>
+    <div class="row"><button class="danger" id="send" disabled>Send for real</button></div>
+    <div id="send-out" class="msg"></div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let lastResume = "";
+
+async function api(path, body) {
+  const opt = body === undefined ? {} : {
+    method: "POST",
+    headers: {"Content-Type": "application/json", "X-Mailmint": "1"},
+    body: JSON.stringify(body)};
+  const r = await fetch(path, opt);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || ("Request failed (" + r.status + ")"));
+  return data;
+}
+async function busy(btn, fn) {
+  btn.disabled = true;
+  try { await fn(); } finally { btn.disabled = false; }
+}
+const job = () => ({company: $("company").value.trim(), role: $("role").value.trim(),
+  apply_link: $("apply_link").value.trim(), jd: $("jd").value,
+  job_id: $("job_id").value.trim(), domain: $("domain").value.trim(),
+  keywords: $("keywords").value});
+
+(async () => {
+  const info = await api("/api/info");
+  $("companies").innerHTML = info.companies.map(c => `<option value="${esc(c)}">`).join("");
+  $("projects").innerHTML = info.projects.map(p => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join("");
+})();
+
+async function loadTracker() {
+  try {
+    const r = await api("/api/applications");
+    $("trk-path").textContent = "Excel file: " + r.path;
+    $("trk-out").innerHTML = r.rows.length ? `<table class="trk"><tr><th>Added</th><th>Company</th><th>Role</th><th>Resume</th><th>Status</th></tr>` +
+      r.rows.map(a => `<tr><td>${esc(a["Date Added"].slice(0, 10))}</td><td>${esc(a["Company"])}</td><td>${esc(a["Role"])}</td>
+        <td>${esc(a["Resume File"])}</td><td><select data-c="${esc(a["Company"])}" data-r="${esc(a["Role"])}" data-j="${esc(a["Job ID"])}">
+        ${r.statuses.map(s => `<option ${s === a["Status"] ? "selected" : ""}>${esc(s)}</option>`).join("")}</select></td></tr>`).join("") + "</table>"
+      : "<span class='muted'>No applications yet. Build a resume and it is logged here.</span>";
+    document.querySelectorAll("#trk-out select").forEach(sel => sel.onchange = async () => {
+      try { await api("/api/applications/status", {company: sel.dataset.c, role: sel.dataset.r, job_id: sel.dataset.j, status: sel.value}); }
+      catch (err) { alert(err.message); loadTracker(); }
+    });
+  } catch (err) { $("trk-out").innerHTML = `<span class="bad">${esc(err.message)}</span>`; }
+}
+$("trk-refresh").onclick = loadTracker;
+loadTracker();
+
+$("detect").onclick = e => busy(e.target, async () => {
+  try {
+    const {fields, keywords} = await api("/api/autofill", {jd: $("jd").value});
+    const filled = [];
+    for (const [id, label] of [["company", "company"], ["role", "role"], ["job_id", "job ID"], ["apply_link", "apply link"]]) {
+      if (fields[id] && !$(id).value.trim()) { $(id).value = fields[id]; filled.push(label); }
+    }
+    $("keywords").value = keywords.join(", ");
+    $("detected").innerHTML = (filled.length ? "Filled in: <b>" + filled.join(", ") + "</b>. " : "") +
+      (keywords.length ? "Skills: " + keywords.map(k => `<span class="tag">${esc(k)}</span>`).join("") : "No known skills found - type them manually.") +
+      " <span class='muted'>Check the fields; edit anything that is off. Domain is guessed automatically at preview if left blank.</span>";
+  } catch (err) { $("detected").innerHTML = `<span class="bad">${esc(err.message)}</span>`; }
+});
+
+$("build").onclick = e => busy(e.target, async () => {
+  const out = $("resume-out"); out.innerHTML = "Compiling LaTeX (the first run downloads packages)...";
+  try {
+    const sel = [...$("projects").selectedOptions].map(o => o.value);
+    const r = await api("/api/resume", {...job(), projects: sel, summary: $("summary").value});
+    lastResume = r.pdf; loadTracker();
+    out.innerHTML =
+      `<div><span class="badge ${r.pages === 1 ? "ok" : "bad"}">${r.pages === 1 ? "&#10003; One page" : r.pages + " pages (too long)"}</span> <b>${esc(r.pdf)}</b></div>` +
+      `<div class="muted"><b>Objective:</b> ${esc(r.objective)}</div>` +
+      (r.ats ? `<div class="${r.ats.missing.length ? "warn" : "ok"}"><b>ATS keyword match:</b> ${r.ats.matched.length} of ${r.ats.matched.length + r.ats.missing.length} job skills appear in the resume` +
+        (r.ats.missing.length ? ` &mdash; not found: ${r.ats.missing.map(esc).join(", ")}` : "") + `</div>` : "") +
+      `<div class="muted">Experience: ${r.experience === "default" ? "default (data engineering)" : esc(r.experience)}</div>` +
+      `<div class="muted">Projects: ${r.projects.map(esc).join("; ")}</div>` +
+      `<div class="muted">Certificates: ${r.certs.length ? r.certs.map(esc).join("; ") : "none relevant"}</div>` +
+      (r.drive ? `<div class="ok">Saved to Drive: ${esc(r.drive)}</div>` : "") +
+      (r.tracker ? `<div class="ok">Logged in tracker: ${esc(r.tracker)}</div>` : "") +
+      r.notes.map(n => `<div class="warn">! ${esc(n)}</div>`).join("") +
+      `<div class="row"><a href="/resumes/${encodeURIComponent(r.pdf)}" download>Download PDF</a> <a href="/resumes/${encodeURIComponent(r.pdf)}" target="_blank">Open in new tab</a></div>` +
+      `<img class="paper" alt="Resume preview" src="/resume-image/${encodeURIComponent(r.pdf)}?t=${Date.now()}">`;
+  } catch (err) { out.innerHTML = `<span class="bad">${esc(err.message).replace(/\n/g, "<br>")}</span>`; }
+});
+
+$("addpeople").onclick = e => busy(e.target, async () => {
+  const out = $("people-out");
+  try {
+    const j = job();
+    const r = await api("/api/people", {...j, names: $("names").value, sector: $("sector").value,
+      sample: $("sample").value, notes: $("notes").value,
+      subject: $("subject").value, body: $("body").value});
+    out.innerHTML = `<span class="ok">Added ${r.added.length}: ${r.added.map(esc).join(", ") || "-"}</span>` +
+      (r.duplicates.length ? `<div class="warn">Already saved: ${r.duplicates.map(esc).join(", ")}</div>` : "") +
+      (r.ignored.length ? `<div class="muted">Ignored ${r.ignored.length} non-name line(s)</div>` : "");
+  } catch (err) { out.innerHTML = `<span class="bad">${esc(err.message)}</span>`; }
+});
+
+$("preview").onclick = e => busy(e.target, async () => {
+  const out = $("preview-out"); out.textContent = "Resolving domains and rendering..."; $("send").disabled = true;
+  try {
+    const r = await api("/api/preview", {company: $("company").value.trim(), retry_bounced: $("retry").checked});
+    out.innerHTML = `<b>${r.sendable}</b> of ${r.plans.length} will be sent.` + r.plans.map(p => p.sendable
+      ? `<details><summary>${esc(p.name)} &rarr; ${esc(p.email)} <span class="muted">(${p.confidence}%)</span></summary>
+         ${p.blanks.length ? `<div class="warn">Empty placeholder(s): ${p.blanks.map(esc).join(", ")}</div>` : ""}
+         ${p.warnings.map(w => `<div class="warn">! ${esc(w)}</div>`).join("")}
+         <pre><b>Subject:</b> ${esc(p.subject)}\n\n${esc(p.body)}</pre></details>`
+      : `<details><summary class="muted">${esc(p.name)} - skipped</summary>${esc(p.reason)}</details>`).join("");
+    $("send").disabled = r.sendable === 0;
+  } catch (err) { out.innerHTML = `<span class="bad">${esc(err.message)}</span>`; }
+});
+
+$("send").onclick = async () => {
+  const company = $("company").value.trim();
+  const n = document.querySelectorAll("#preview-out details summary:not(.muted)").length;
+  const att = lastResume ? "with the resume " + lastResume : "with the default resume from config.yaml";
+  if (!confirm(`Send ${n} real email(s) for "${company}" ${att}? This cannot be undone.`)) return;
+  const out = $("send-out"); $("send").disabled = true;
+  try {
+    await api("/api/send", {company, resume: lastResume, retry_bounced: $("retry").checked, confirm: true});
+    const timer = setInterval(async () => {
+      const s = await api("/api/send/status");
+      out.innerHTML = `Sent ${s.sent}, failed ${s.failed}, ${s.done}/${s.total} done` +
+        (s.running ? " ... (messages are spaced out on purpose; keep this tab and the terminal open)" : "") +
+        `<pre>${s.lines.map(esc).join("\n")}</pre>` + (s.error ? `<div class="bad">${esc(s.error)}</div>` : "");
+      if (s.finished) { clearInterval(timer); out.innerHTML += `<div class="ok">Finished. Wait ~15 min, then run reconcile.</div>`; }
+    }, 2000);
+  } catch (err) { out.innerHTML = `<span class="bad">${esc(err.message)}</span>`; $("send").disabled = false; }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+# Fixed details, identical on every resume. Plain text: LaTeX characters
+# (& % $ # _) are escaped for you; **double stars** make bold.
+name: "Aaditee Agrawal"
+contact:
+  phone: "+91-6386862949"
+  location: "Mohali, Punjab"
+  email: "aadiagrawal69@gmail.com"
+links:
+  - {label: "LinkedIn", url: "https://www.linkedin.com/in/aaditee-agrawal-345a4a25a/"}
+  - {label: "GitHub",   url: "https://github.com/Aaditee117"}
+  - {label: "LeetCode", url: "https://leetcode.com/u/Aditee_agrawal/"}
+
+# Used to write the objective for each job ("<role> with hands-on experience <focus>,
+# working with <skills from the posting that you list below>"). A variant's own
+# objective_focus replaces this one.
+objective_focus: "designing and building scalable ETL/ELT pipelines, data quality frameworks, and cloud-native data platforms"
+
+# Fallback objective, used when a posting matches too few of your skills.
+# Default objective. Override per job with:  resume ... --summary "text"
+objective: "Data Engineer with hands-on experience designing and building scalable ETL/ELT pipelines, data quality frameworks, and cloud-native data platforms using Microsoft Fabric, PySpark, Delta Lake, SQL, and REST APIs. Skilled in data modeling, data warehousing, distributed data processing, and Big Data pipeline orchestration, with a strong foundation in Python and Azure cloud services, seeking to deliver reliable, high-quality data solutions for data-driven decision-making."
+
+education:
+  - school: "Chandigarh University"
+    location: "Mohali, Punjab"
+    degree: "B.E. in Computer Science Engineering | CGPA: 7.85"
+    dates: "Aug. 2022 -- Jul. 2026"
+
+skills:
+  "Languages": "Python, SQL, C++"
+  "Data Engineering & Orchestration": "Microsoft Fabric, Azure Data Factory, Delta Lake, ETL/ELT Pipelines, REST APIs"
+  "Big Data & Processing": "PySpark, Distributed Data Processing, Batch Data Processing"
+  "Cloud & Storage": "Microsoft Azure, Azure Blob Storage, Azure Data Lake Storage (ADLS Gen2), Azure Cosmos DB"
+  "Databases": "SQL Server (SSMS), MySQL, Cosmos DB, Data Modeling, Data Warehousing"
+  "BI & Visualization": "Power BI (Dashboards, DAX, Data Modeling)"
+  "Tools & DevOps": "Git/GitHub, Docker, VS Code, CI/CD Fundamentals"
+  "Core Concepts": "Data Quality & Validation, Data Pipeline Design, Data Lakehouse Architecture, Machine Learning, Deep Learning, NLP"
+
+experience:
+  - title: "Software Engineer Intern -- Optimus Information Inc."
+    dates: "Mar 2026 -- Aug 2026"
+    bullets:
+      - "Engineered scalable data quality and ETL validation frameworks on Microsoft Fabric using PySpark and REST APIs, streamlining pipeline testing across multiple data sources."
+      - "Designed reusable data quality checks with Delta Lake-based logging and quarantine architecture, improving failure detection and end-to-end data traceability."
+      - "Built source-to-Gold layer validation pipelines and Power BI dashboards, boosting pipeline reliability and enabling real-time data observability for stakeholders."
+    # The bullets above are the default (data roles). A variant replaces them
+    # when the job matches its tags; exclude_projects avoids repeating the same
+    # work in the Projects section.
+    variants:
+      - name: optistudio
+        tags: [software engineer, software developer, sde, full stack, full stack developer, backend, frontend, web, web application, react, typescript, python developer, java developer, generative ai, genai, gen ai, llm, ai engineer, openai, azure openai, gpt]
+        exclude_projects: [optistudio]
+        objective_focus: "designing AI-powered web applications and cloud-native solutions on Azure"
+        # Extra skills this variant lets the objective name (from the OptiStudio work).
+        skills: [React, TypeScript, Python, Azure OpenAI, GPT-4, REST APIs, Azure]
+        bullets:
+          - "Designed OptiStudio, an AI-powered web application that converts meeting transcripts, email threads, and SRS documents into data flow diagrams, architecture diagrams, presentation decks, and Azure cost reports for presales teams."
+          - "Defined the system architecture and workflows, combining a React/TypeScript frontend with a Python backend integrated with Azure OpenAI (GPT-4) for automated document and diagram generation."
+          - "Outlined security considerations, including role-based access control and data isolation, to support secure, cross-functional presales workflows."
+
+certifications:
+  # Every cert is chosen per job by tag match (add pin: true to force one onto every resume).
+  - {name: "Databricks Certified Generative AI Engineer Associate", tags: [databricks, generative ai, genai, gen ai, llm, ai, spark, data engineer, data engineering, machine learning, ml engineer]}
+  - {name: "Microsoft Certified: Fabric Data Engineer Associate (DP-700)", tags: [fabric, microsoft fabric, data engineer, data engineering, etl, pipeline, lakehouse, pyspark, azure, delta lake]}
+  - {name: "Microsoft Certified: Fabric Analytics Engineer Associate (DP-600)", tags: [fabric, microsoft fabric, analytics, analytics engineer, power bi, bi, data analyst, data warehouse, data engineer, dax, reporting]}
+  - {name: "Microsoft Certified: Azure Fundamentals (AZ-900)", tags: [azure, cloud, microsoft, devops, data engineer, cloud engineer, infrastructure]}
+  - {name: "Databases and SQL for Data Science with Python", tags: [sql, database, databases, python, data analyst, data scientist, data engineer, analyst]}
+  # Everything below is chosen per job by tag match against --keywords / role,
+  # only if it matches, and only while there is room (--max-certs).
+  - {name: "Cloud Computing -- Elite Silver Certification (NPTEL)", tags: [cloud, azure, aws, devops]}
+  - {name: "Python for Everybody Specialization -- University of Michigan (Coursera)", tags: [python, sql, databases, data, web, scripting]}
+  - {name: "SQL: A Practical Introduction for Querying Databases -- IBM (Coursera)", tags: [sql, database, databases, analyst, data analyst, etl]}
+  - {name: "Introduction to Relational Databases (RDBMS) -- IBM (Coursera)", tags: [rdbms, sql, database, databases, dba]}
+  - {name: "Introduction to Databases -- Meta (Coursera)", tags: [database, databases, sql, backend]}
+  - {name: "Machine Learning with Python: Build Real-World ML Models -- IBM (Coursera)", tags: [machine learning, ml, python, data scientist, ai, scikit-learn]}
+  - {name: "AI Foundations: How Artificial Intelligence Works -- IBM (Coursera)", tags: [ai, artificial intelligence, genai, ml]}
+  - {name: "Machine Learning for All -- University of London (Coursera)", tags: [machine learning, ml, ai, data scientist]}
+  - {name: "Algorithmic Toolbox -- UC San Diego (Coursera)", tags: [algorithms, dsa, data structures, software engineer, sde, developer, engineer]}
+  - {name: "Java Full Stack Specialization -- Fundamentals, Frontend, Data Structures & Backend (Coursera)", tags: [java, full stack, backend, frontend, web, software engineer, sde, developer]}
+  - {name: "Django for Everybody Specialization -- University of Michigan (Coursera)", tags: [django, python, web, backend, full stack, developer]}
+  - {name: "React Native -- Meta (Coursera)", tags: [react, react native, mobile, frontend, javascript, full stack]}
+  - {name: "Excel and Copilot Fundamentals -- Microsoft (Coursera)", tags: [excel, copilot, analyst, data analyst, business analyst, reporting]}
+  - {name: "Adobe Digital Marketing Strategy Specialization (Coursera)", tags: [marketing, digital marketing, content, social media]}
+  - {name: "Developing Industrial Internet of Things Specialization -- University of Colorado Boulder (Coursera)", tags: [iot, embedded, industrial, edge]}
+  - {name: "5G Mobile Networks Specialization -- LearnQuest (Coursera)", tags: [5g, telecom, networking, wireless, network]}
+  - {name: "4G Network Fundamentals -- Institut Mines-Telecom (Coursera)", tags: [4g, telecom, networking, wireless, network]}
+  - {name: "Wireless Communications for Everybody -- Yonsei University (Coursera)", tags: [wireless, telecom, networking, communications]}
+  - {name: "Introduction to Hardware and Operating Systems -- IBM (Coursera)", tags: [hardware, operating systems, os, support, it support, sysadmin]}
+  - {name: "Successful Negotiation: Essential Strategies and Skills -- University of Michigan (Coursera)", tags: [negotiation, sales, business development, account manager]}
+  - {name: "Approximation Methods -- University of Colorado Boulder (Coursera)", tags: [optimization, algorithms, research, mathematics]}
+  - {name: "How to Write and Publish a Scientific Paper -- Ecole Polytechnique (Coursera)", tags: [research, scientific writing, paper, academic]}
+  # --- LinkedIn Learning ---
+  - {name: "Generative AI: Introduction to Large Language Models -- LinkedIn Learning", tags: [llm, generative ai, genai, ai, nlp, machine learning, data scientist]}
+  - {name: "Introduction to Generative AI with GPT -- LinkedIn Learning", tags: [gpt, generative ai, genai, llm, ai, openai]}
+  - {name: "Azure OpenAI: Generative AI Models and How to Use Them -- LinkedIn Learning", tags: [azure openai, openai, azure, generative ai, genai, llm, ai, cloud]}
+  - {name: "Responsible Generative AI and Local LLMs -- LinkedIn Learning", tags: [llm, generative ai, genai, ai, responsible ai, mlops]}
+  - {name: "Understanding Generative AI in Cloud Computing: Services and Use Cases -- LinkedIn Learning", tags: [generative ai, genai, cloud, azure, aws, ai]}
+  - {name: "Generative AI vs. Traditional AI -- LinkedIn Learning", tags: [generative ai, genai, ai, machine learning, ml]}
+  - {name: "Introduction to Generative Adversarial Networks (GANs) -- LinkedIn Learning", tags: [gan, deep learning, generative ai, ai, computer vision]}
+  - {name: "HTML, CSS, and Generative AI: Speed Up Your Process -- LinkedIn Learning", tags: [html, css, frontend, web, generative ai, developer]}
+  - {name: "SPSS for Academic Research -- LinkedIn Learning", tags: [spss, statistics, research, analyst, data analyst]}
+  - {name: "Academic Research Foundations: Quantitative -- LinkedIn Learning", tags: [research, statistics, quantitative, analyst, data analyst]}
+  - {name: "Technical Writing: Quick Start Guides -- LinkedIn Learning", tags: [technical writing, documentation, writer, technical writer]}
+  - {name: "Writing White Papers -- LinkedIn Learning", tags: [white paper, technical writing, writer, content, marketing]}
+  - {name: "Problem-Solving Techniques -- LinkedIn Learning", tags: [problem solving, consultant, business analyst, analyst, consulting]}
+  - {name: "Consulting Foundations -- LinkedIn Learning", tags: [consulting, consultant, business analyst, client]}
+  - {name: "Creating a Business Plan -- LinkedIn Learning", tags: [business plan, business analyst, entrepreneur, strategy, product]}
+  - {name: "Conducting a SWOT Analysis -- LinkedIn Learning", tags: [swot, business analyst, strategy, analyst, product]}
+  - {name: "Social Media Marketing for Small Business -- LinkedIn Learning", tags: [social media, marketing, digital marketing, content]}
+  - {name: "Virtual Selling for Sales Professionals -- LinkedIn Learning", tags: [sales, business development, account manager, selling]}
+  - {name: "Time Management Fundamentals -- LinkedIn Learning", tags: [time management, project manager, coordinator, productivity]}
+  - {name: "Project Management: Government Projects -- LinkedIn Learning", tags: [project management, project manager, government, program manager]}
+
+achievements:
+  - "**Certificate of Achievement:** Top 5% in Talent Park by Unstop."
+  - "**Performer of the month:** received performer of the month award for delivering exceptional work on a client project during internship at Optimus Information."
+  - "**Competitive Coding:** Solved 300+ DSA problems on LeetCode with a focus on algorithms and data structures."

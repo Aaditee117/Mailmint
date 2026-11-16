@@ -27,7 +27,7 @@ def build_message(
     to_address: str,
     subject: str,
     body: str,
-    attachment: Path | None = None,
+    attachment: Path | list[Path] | None = None,
 ) -> EmailMessage:
     """Compose a plain-text message with an optional resume attachment.
 
@@ -45,16 +45,17 @@ def build_message(
     message["Reply-To"] = config.reply_to or creds.user
     message.set_content(body)
 
-    if attachment:
-        if not attachment.exists():
-            raise SendError(f"attachment not found: {attachment}")
-        guessed, _ = mimetypes.guess_type(attachment.name)
+    attachments = [attachment] if isinstance(attachment, Path) else list(attachment or [])
+    for item in attachments:
+        if not item.exists():
+            raise SendError(f"attachment not found: {item}")
+        guessed, _ = mimetypes.guess_type(item.name)
         maintype, _, subtype = (guessed or "application/octet-stream").partition("/")
         message.add_attachment(
-            attachment.read_bytes(),
+            item.read_bytes(),
             maintype=maintype,
             subtype=subtype or "octet-stream",
-            filename=attachment.name,
+            filename=item.name,
         )
     return message
 

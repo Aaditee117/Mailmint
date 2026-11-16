@@ -58,6 +58,61 @@ Then fill in:
 - **`resume.pdf`** — or blank out `sender.resume` in `config.yaml`
 - **`config.yaml`** — set `sender.name`
 
+## Web interface (no command line needed)
+
+Double-click `start_ui.bat` (or run `python run.py ui`). A page opens at
+http://127.0.0.1:5000 with four steps: enter the job posting (paste the job
+description to auto-detect skills), build the tailored resume, save the people
+to email, then preview and send. It is local-only and nothing is sent until you
+press "Send for real" and confirm. Keep the window open while a send runs.
+
+## Custom mails (not just the one template)
+
+Three ways, from most to least personal:
+
+1. **One-off mail to any address** - no guessing, no `people.csv`:
+   ```bash
+   python run.py compose --to someone@acme.com --subject "Quick question" --body-file note.txt --attach Data-resume.pdf
+   python run.py compose --to a@x.com,b@y.com --subject "Hello" --body "Hi,
+
+Text here.
+{sender_name}" --live
+   ```
+   Omit `--body` to type it interactively (end with a line containing `.`).
+   Dry run unless `--live`; every recipient gets a separate message.
+2. **Per-person custom text** - add `subject` and/or `body` columns to
+   `people.csv`. When filled, they replace the shared template for that person
+   (use `
+` for line breaks, or a quoted multi-line cell). Placeholders work.
+3. **Different template per batch** - `python run.py send --template other.txt`
+   (also on `preview`).
+
+Any extra column you add to `people.csv` (say `project`) becomes a placeholder
+`{project}` usable in templates and custom bodies.
+
+## Tailored one-page resume per job
+
+The layout is fixed in `resume/template.tex` (your LaTeX format). Your details
+live in `resume/profile.yaml`; your project pool is `resume/projects.yaml`.
+
+```bash
+python run.py resume --company "CGI" --role "Data Engineer" --keywords "pyspark,cdc,adf"
+python run.py resume --company "Acme" --role "BI Developer" --projects medallion-lakehouse,cdc-ingestion
+python run.py resume --list-projects
+```
+
+- Projects are ranked by how well their `tags` match `--keywords` and the role
+  title (or force them with `--projects`); the top 3 are used (`--max-projects`).
+- It compiles with Tectonic (`tools/tectonic/`), checks the result is one page,
+  and trims bullets then lowest-ranked projects until it fits.
+- Output: `resumes/Aaditee_Agrawal_<Role>_<Company>.pdf` and `.tex`.
+- Google Drive: install Google Drive for desktop, then set
+  `resume.drive_dir` in `config.yaml` (e.g. `G:/My Drive/Resumes`); the PDF and
+  `.tex` are copied there on every build.
+- Overleaf: paste any generated `.tex` into a new Overleaf project to edit it
+  by hand; it compiles there as-is.
+- Mail it: `python run.py send --company CGI --resume resumes/<file>.pdf --live`.
+
 ## The loop, one company at a time
 
 This is the flow it is built around. Repeat it per company; `sent_log.csv` is

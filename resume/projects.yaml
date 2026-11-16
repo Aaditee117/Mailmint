@@ -1,0 +1,79 @@
+# Your project pool. Each resume picks the best few for the job.
+#   id       short unique name (use with --projects id1,id2)
+#   title    shown on the resume (plain text; bold is automatic)
+#   tech     optional; shown in the title as "Title | tech"
+#   tags     lowercase keywords matched against --keywords and the role title
+#   bullets  strongest first; when space runs out, the last ones are trimmed
+# No dates are stored: they are assigned at build time from the last 6 months.
+# Add new projects by copying a block.
+
+- id: fabric-pyspark-pipeline
+  title: "Data Pipeline using Microsoft Fabric & PySpark"
+  tags: [fabric, microsoft fabric, pyspark, adls, delta lake, batch, etl, pipeline, data engineer, data engineering, azure, big data, spark]
+  bullets:
+    - "Architected an end-to-end batch data pipeline using Microsoft Fabric, PySpark, and Azure Data Lake Storage for scalable, high-volume data processing."
+    - "Optimized data storage and query performance using Delta Lake and partitioning strategies, improving pipeline reliability and scalability."
+
+- id: medallion-lakehouse
+  title: "Medallion Lakehouse & BI Reporting Pipeline"
+  tags: [medallion, lakehouse, fabric, microsoft fabric, pyspark, power bi, bi, dashboards, star schema, data modeling, data warehouse, azure data factory, adf, analytics, reporting, delta lake, data engineer, bi developer]
+  bullets:
+    - "Designed a Bronze-Silver-Gold medallion lakehouse in Microsoft Fabric, using PySpark notebooks to clean and transform raw ADLS data into curated Delta tables."
+    - "Modeled a star-schema (fact/dimension) design in the Gold layer and built interactive Power BI dashboards for sales and performance reporting."
+    - "Orchestrated end-to-end pipeline scheduling and triggers with Azure Data Factory, reducing manual refresh effort and improving data freshness."
+
+- id: cdc-ingestion
+  title: "Incremental CDC Data Ingestion Pipeline"
+  tags: [cdc, change data capture, incremental, azure data factory, adf, sql server, scd, pyspark, cosmos db, docker, etl, data validation, ingestion, pipeline, data engineer, data engineering, azure, sql]
+  bullets:
+    - "Built an incremental ingestion pipeline with Azure Data Factory and SQL Server Change Data Capture (CDC) to sync only modified records, cutting pipeline runtime."
+    - "Implemented Slowly Changing Dimension (SCD Type 2) logic in PySpark to preserve historical record versions, with semi-structured data stored in Azure Cosmos DB."
+    - "Containerized pipeline components with Docker and added schema/data validation checks to ensure consistency across ingestion runs."
+
+- id: optistudio
+  title: "OptiStudio -- AI-Powered Presales Deck Generator Platform"
+  tags: [generative ai, genai, gen ai, llm, openai, azure openai, gpt, gpt-4, react, typescript, python, web application, full stack, frontend, backend, architecture, ai, ai engineer, presales, azure, rbac, security]
+  bullets:
+    - "Designed a web application that converts meeting transcripts, email threads, and SRS documents into data flow diagrams, architecture diagrams, presentation decks, and Azure cost reports for presales teams."
+    - "Defined the system architecture and workflows, combining a React/TypeScript frontend with a Python backend integrated with Azure OpenAI (GPT-4) for automated document and diagram generation."
+    - "Outlined key security considerations, including role-based access control and data isolation, to support secure, cross-functional presales workflows."
+
+- id: flight-delay
+  title: "Predicting Flight Delays with Machine Learning"
+  tags: [machine learning, ml, python, scikit-learn, random forest, decision tree, classification, regression, pandas, data scientist, ml engineer, data science, model, predictive modeling, sdlc]
+  bullets:
+    - "Developed a flight-delay prediction model using Python and scikit-learn with Random Forest and Decision Tree algorithms, achieving 91% accuracy."
+    - "Performed data preprocessing, feature engineering, model training, and evaluation using RMSE and MAE across the full SDLC."
+
+- id: potato-disease-cnn
+  title: "Potato Disease Classification using CNN"
+  tags: [deep learning, cnn, tensorflow, keras, opencv, computer vision, image classification, machine learning, ml, python, ai, ml engineer, data scientist]
+  bullets:
+    - "Developed a convolutional neural network (CNN) for classifying potato leaf diseases with over 90% accuracy."
+    - "Utilized TensorFlow/Keras and OpenCV for image preprocessing and model training."
+
+- id: sales-data-analysis
+  title: "Sales Data Analysis and Visualization"
+  tech: "Python, SQL, Power BI, Pandas, NumPy"
+  tags: [sales, data analysis, data analyst, analytics, sql, python, pandas, numpy, power bi, bi, visualization, dashboards, reporting, data cleaning, etl, business analyst]
+  bullets:
+    - "Built and optimized SQL queries to efficiently extract and aggregate sales data from databases."
+    - "Automated data cleaning and transformation processes using Pandas and NumPy, reducing reporting time by 30%."
+
+- id: financial-forecasting
+  title: "Financial Data Analysis and Forecasting"
+  tech: "Python, Pandas, Matplotlib"
+  tags: [financial analysis, finance, forecasting, time series, arima, python, pandas, matplotlib, data analysis, data analyst, analytics, statistics, business analyst, data scientist]
+  bullets:
+    - "Analyzed financial statements and transaction data to identify spending patterns."
+    - "Applied time-series analysis to forecast future revenue trends using ARIMA models."
+    - "Identified cost-saving opportunities, reducing expenses by 12% for a business case study."
+
+- id: ecommerce-analysis
+  title: "E-commerce Product Performance Analysis"
+  tech: "Python, MySQL, Excel, Power BI"
+  tags: [ecommerce, e-commerce, product analysis, data analysis, data analyst, analytics, mysql, sql, python, excel, power bi, bi, dashboards, sentiment, customer analytics, business analyst, marketing]
+  bullets:
+    - "Conducted an in-depth analysis of product sales, customer reviews, and return rates."
+    - "Developed Power BI dashboards showcasing top-selling products, revenue trends, and customer sentiment."
+    - "Recommended pricing and marketing strategies that led to a 15% increase in product sales."

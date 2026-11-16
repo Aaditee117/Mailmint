@@ -39,3 +39,8 @@ paths:
   template: template.txt
   sent_log: sent_log.csv
   learned: learned_patterns.json
+
+resume:
+  output_dir: resumes
+  # Folder synced by Google Drive for desktop, e.g. "G:/My Drive/Resumes". Blank = skip.
+  drive_dir: "G:/My Drive/resumes"

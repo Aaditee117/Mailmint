@@ -12,12 +12,13 @@ from .patterns import NameParts, parse_name, parse_sample_field
 KNOWN_COLUMNS = {
     "first", "last", "full_name", "company", "domain", "role",
     "job_id", "sample_email", "sector", "notes", "email",
+    "subject", "body",
 }
 
 # The column order written by `add` when creating people.csv.
 CANONICAL_COLUMNS = [
     "first", "last", "company", "domain", "role",
-    "job_id", "sample_email", "sector", "notes",
+    "job_id", "sample_email", "sector", "notes", "subject", "body",
 ]
 
 
@@ -38,6 +39,12 @@ class Person:
     # skipped entirely for this person.
     known_email: str
     name: NameParts = field(init=False)
+    # Optional per-person custom mail. When set, they replace the shared
+    # template's subject/body for this person (placeholders still work).
+    subject: str = ""
+    body: str = ""
+    # Any other CSV column becomes a custom {placeholder} for this person.
+    extras: dict = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.name = parse_name(self.first, self.last, f"{self.first} {self.last}".strip())
@@ -84,7 +91,10 @@ def load_people(path: Path) -> tuple[list[Person], list[str]]:
         headers = {(h or "").strip().lower() for h in reader.fieldnames}
         unknown = headers - KNOWN_COLUMNS - {""}
         if unknown:
-            warnings.append(f"ignoring unrecognised column(s): {', '.join(sorted(unknown))}")
+            warnings.append(
+                "custom column(s) usable as placeholders: "
+                + ", ".join("{" + c + "}" for c in sorted(unknown))
+            )
         if not headers & {"first", "full_name"}:
             raise ValueError(f"{path} needs a 'first' or 'full_name' column")
 
@@ -122,6 +132,9 @@ def load_people(path: Path) -> tuple[list[Person], list[str]]:
                     sector=row.get("sector", ""),
                     notes=row.get("notes", ""),
                     known_email=known_email,
+                    subject=row.get("subject", ""),
+                    body=row.get("body", "").replace("\\n", "\n"),
+                    extras={k: v for k, v in row.items() if k in unknown},
                 )
             )
 

@@ -32,11 +32,10 @@ class Template:
         return found
 
 
-def load_template(path: Path) -> Template:
-    if not path.exists():
-        raise TemplateError(f"template not found: {path}")
-
-    lines = path.read_text(encoding="utf-8").splitlines()
+def parse_template(text: str, source: str = "template") -> Template:
+    """Parse 'Subject: ...' + body text into a Template."""
+    path = source
+    lines = text.splitlines()
     kept = [ln for ln in lines if not ln.lstrip().startswith("#")]
 
     subject = ""
@@ -60,17 +59,19 @@ def load_template(path: Path) -> Template:
     if not body.strip():
         raise TemplateError(f"{path}: body is empty")
 
-    unknown = {
-        f for _, f, _, _ in Formatter().parse(subject + body) if f
-    } - set(PLACEHOLDERS)
-    if unknown:
-        bad = ", ".join("{" + name + "}" for name in sorted(unknown))
-        available = ", ".join("{" + name + "}" for name in PLACEHOLDERS)
-        raise TemplateError(
-            f"{path}: unknown placeholder(s) {bad}. Available: {available}"
-        )
-
     return Template(subject=subject, body=body.rstrip() + "\n")
+
+
+def load_template(path: Path) -> Template:
+    if not path.exists():
+        raise TemplateError(f"template not found: {path}")
+    return parse_template(path.read_text(encoding="utf-8"), str(path))
+
+
+def effective_template(template: Template, person: Person) -> Template:
+    subject = (getattr(person, "subject", "") or "").strip() or template.subject
+    body = (getattr(person, "body", "") or "").strip()
+    return Template(subject=subject, body=(body + "\n") if body else template.body)
 
 
 def humanise(text: str) -> str:
@@ -88,7 +89,9 @@ def humanise(text: str) -> str:
 
 
 def context_for(person: Person, sender_name: str) -> dict[str, str]:
+    extras = {k: v for k, v in (getattr(person, "extras", None) or {}).items() if k}
     return {
+        **extras,
         "first_name": humanise(person.first or person.name.first),
         "last_name": humanise(person.last or person.name.last),
         "full_name": humanise(person.display_name),
@@ -101,13 +104,20 @@ def context_for(person: Person, sender_name: str) -> dict[str, str]:
 
 
 def render(template: Template, person: Person, sender_name: str) -> tuple[str, str]:
-    """Return (subject, body) for one person."""
+    """Return (subject, body) for one person.
+
+    A person's own `subject` / `body` (from people.csv) override the template.
+    """
+    template = effective_template(template, person)
     context = context_for(person, sender_name)
     try:
         subject = template.subject.format(**context)
         body = template.body.format(**context)
     except KeyError as exc:
-        raise TemplateError(f"template uses unknown placeholder {exc}") from exc
+        available = ", ".join("{" + k + "}" for k in sorted(context))
+        raise TemplateError(
+            f"unknown placeholder {exc} for {person.display_name}. Available: {available}"
+        ) from exc
     except (IndexError, ValueError) as exc:
         raise TemplateError(
             f"template has a malformed brace - to write a literal brace, double "
@@ -132,4 +142,5 @@ def _tidy(text: str) -> str:
 def empty_placeholders(template: Template, person: Person, sender_name: str) -> list[str]:
     """Placeholders the template uses but this person has no value for."""
     context = context_for(person, sender_name)
+    template = effective_template(template, person)
     return sorted(f for f in template.fields_used if not context.get(f, "").strip())
